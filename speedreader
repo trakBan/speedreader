@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+# This code is licensed under GNU General Public License v3.0. I encouruage you to do the same to the software you write!
+
+import sys
+import os
+from time import sleep
+
+# Local file
+from config import *
+
+# Adding ANSI color sequences to text
+# It replaces the word with ANSI color sequence + word + ANSII END
+# Example of ANSI color sequnece that will print red color is \033[0;31m "example text" \033[0m
+def FormatColors(word):
+
+    # Highligthing for the middle letter
+    try:
+        word_highlighting_mid = len(word) // 2
+        word = word.replace(word[word_highlighting_mid], f"\033[1;{MIDDLE_LETTER}m{word[word_highlighting_mid]}\033[0m", 1)
+    except ValueError:
+        pass
+
+    # Highligthing for '
+    try:
+        word_highlighting_apostrophe = word.index("'")
+        word = word.replace(word[word_highlighting_apostrophe], f"\033[1;{APOSTROPHE}m{word[word_highlighting_apostrophe]}\033[0m")
+    except ValueError:
+        pass
+
+    # Highligthing for .
+    try:
+        word_highlighting_dot = word.index(".")
+        word = word.replace(word[word_highlighting_dot], f"\033[1;{DOT}m{word[word_highlighting_dot]}\033[0m")
+    except ValueError:
+        pass
+
+    try:
+        word_highlighting_comma = word.index(",")
+        word = word.replace(word[word_highlighting_comma], f"\033[1;{COMMA}m{word[word_highlighting_comma]}\033[0m")
+    except ValueError:
+        pass
+
+    return word
+
+# "renders" the word to the middle of the sreen
+def Render(word, ClearCommand):
+  
+    # Gets the terminal dimensions
+    width = os.get_terminal_size()[0]
+    height = os.get_terminal_size()[1]
+    spaces = [""]
+    spaces_stationary = [""]
+
+    # Could probably be done in a list coprehension
+    for i in range(width // 2 - 3 + PIPE_CALIBRATION):
+        spaces_stationary.append(" ")
+
+    os.system(ClearCommand)
+    for x in range(height):
+    
+        print()
+        # When it reaches half of the height it will start calculating the half od the width
+        if x == (height // 2 + 1):
+            
+            # When it calculated the half of the width plus some calibration it will append " " in a list
+            # The list will have exactly enough spaces in it so the word will be in the center
+            
+            # Could probably be done in a list coprehension
+            # If you want to understand this for loop just put "width // 2" in range()
+            for i in range((width // 2 - len(word) // 2) - 1):
+                spaces.append(" ")
+
+            # Prints "|" to the middle of the screen          ▼
+            print(f"{''.join(spaces_stationary)}\033[1;{PIPE}m|\033[0m")
+
+            # Puts the ANSI color sequences to certain chars
+            word = FormatColors(word)
+            # Prints the word to the middle of the screen
+            print(f"{''.join(spaces)}{word}", end="")
+
+            # Prints "|" to the middle of the screen            ▼
+            print(f"\n{''.join(spaces_stationary)}\033[1;{PIPE}m|\033[0m")
+            print("\r", end="")
+
+# Returns the command that is appropiate for a certain OS
+def Clear():
+    if os.name in ("posix"):
+        return "clear"
+
+    elif os.name in ("nt"):
+        return "cls"
+
+# Check the arguments
+try:
+    first_arg = sys.argv[1]
+
+    # If first arg doesn't need anything assigned to it it won't check for the second arg
+    if first_arg in ["--help", "-h"]:
+        pass
+    else:
+        try:
+            # It will check for the second argument 
+            second_arg = sys.argv[2]
+        
+        except IndexError:
+            print(f"incorrect usage of '{first_arg}'")
+            raise SystemExit()
+
+except IndexError:
+    first_arg = 0
+    print(f"No arguments were passed, default WPM of {WPM} passed")
+    sleep(0.5)
+
+if first_arg in ["--wpm", "-w"]:
+    try:
+        WPM = int(second_arg)
+    except ValueError:
+        print("Incorrect usage of --wpm")
+        raise SystemExit()
+
+if first_arg in ["--help", "-h"]:
+    print("""
+    --wpm | -w , usage: -w {number}, WPM - words per minute
+    --help | -h , usage -h, this will print what each argument does
+    """)
+    raise SystemExit()
+
+os.system(Clear())
+sentence = input("> Type your sentences here: \n").split()
+os.system(Clear())
+
+# Gets how long the words should stay on the screen
+# WPM - words per minute
+WPM = len(sentence) / WPM
+
+# Hides the cursor
+sys.stdout.write("\033[?25l")
+
+counter = -1
+while True:
+
+    counter = counter + 1
+    try:
+        sleep(WPM)
+        Render(sentence[counter], Clear())
+
+    except KeyboardInterrupt:
+        sys.stdout.write("\033[?25h")
+        os.system(Clear())
+        raise SystemExit("\nUser interruped with the operation, aborting.")
+
+    if counter == len(sentence) - 1:
+        print("Done")
+        break
+
+# Shows the cursor
+sys.stdout.write("\033[?25h")

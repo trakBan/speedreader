@@ -8,15 +8,17 @@ brown = 33
 blue = 34
 purple = 35
 cyan = 36
+light_gray = 37
 
 # /-----------------------\
 # |CONFIG FILE STARTS HERE|
 # \-----------------------/
 
 # WPM - words per minute
+# This will be default WPM if no arguments were passed
 WPM = 800
 
-# Avaliable colors are: black, red, greeen, brown, blue, purple, cyan
+# Avaliable colors are: black, red, greeen, brown, blue, purple, cyan, light_gray
 # The color that highlights the middle letter
 MIDDLE_LETTER = red
 
