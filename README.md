@@ -17,3 +17,13 @@ sudo python setup.py install
 ```
 git clone https://github.com/trakBan/speedreader.git && cd speedreader && chmod +x speedreader && sudo python setup.py install
 ```
+
+# Usage
+
+```
+--wpm | -w , usage: -w {number}, WPM - words per minute
+--help | -h , usage -h, this will print what each argument does
+```
+
+# Config file
+You can change colors, default WPM and other things in ```config.py```. documentation is contained inside the config file in the form of the comments.
