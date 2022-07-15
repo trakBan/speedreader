@@ -26,4 +26,6 @@ git clone https://github.com/trakBan/speedreader.git && cd speedreader && chmod 
 ```
 
 # Config file
+
+Path for config file: ```~/.config/speedreader/config.py```
 You can change colors, default WPM and other things in ```config.py```. documentation is contained inside the config file in the form of the comments.
